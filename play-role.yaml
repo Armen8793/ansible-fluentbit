@@ -1,0 +1,39 @@
+---
+
+#- hosts: dev
+# become: true
+#  any_errors_fatal: true
+# gather_facts: true
+# roles:
+#   - fluentbit
+
+
+- hosts: dev
+  become: true
+  gather_facts: true
+  roles:
+    - role: fluentbit
+      vars:
+        fluentbit_conf_service_settings:
+          - name: parsers_file
+            value: /home/armen/ansible-comand/parsers.conf
+        fluentbit_conf_inputs:
+          - name: tail
+            path: /var/lib/docker/containers/*/*.log
+          - name: docker
+            tag: host.*
+            systemd_filter: _SYSTEMD_UNIT=docker.service
+        fluentbit_conf_outputs:
+          - name: opensearch
+            match: '*'
+            host: opensearch1.armbusinessbank.am
+            port: 9200
+              #uri: /something
+        fluentbit_conf_filters:
+          - name: record_modifier
+            match: '*'
+            record: hostname ${HOSTNAME}
+        fluentbit_custom_conf_files:
+          - /home/armen/ansible-comand/fluent-bit.conf
+        fluentbit_custom_parsers_files:
+          - /home/armen/ansible-comand/parsers.conf

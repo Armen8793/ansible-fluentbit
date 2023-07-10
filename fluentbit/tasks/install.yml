@@ -1,0 +1,6 @@
+---
+
+- name: Install td-agent-bit package
+  package:
+    name: td-agent-bit
+    state: present

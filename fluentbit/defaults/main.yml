@@ -1,0 +1,61 @@
+---
+
+fluentbit_apt_repo: deb https://packages.fluentbit.io/ubuntu/focal focal main
+
+fluentbit_conf_service_settings:
+  - name: flush
+    value: 1
+  - name: daemon
+    value: 'Off'
+  - name: log_level
+    value: info
+  - name: parsers_file
+    value: parsers.conf
+  - name: plugins_file
+    value: plugins.conf
+  - name: http_server
+    value: 'On'
+  - name: http_listen
+    value: 0.0.0.0
+  - name: http_port
+    value: 2020
+  - name: storage.metrics
+    value: 'On'
+  - name: health_check
+    value: 'On'
+  - name: hc_errors_count
+    value: 5
+  - name: hc_retry_failure_count
+    value: 5
+  - name: hc_period
+    value: 5
+
+fluentbit_conf_inputs:
+  - name: tail
+    tag: docker
+    parser: docker
+    path: /var/lib/docker/containers/*/*.log
+    skip_empty_lines: true
+    interval_sec: 1
+
+fluentbit_conf_outputs:
+  #- name: opensearch
+  - name: logstash
+    match: docker
+    host: example.com
+    port: 9200
+      #http_user: admin
+      #http_passwd: your opensearch passwd here
+    retry_limit: false
+    tls.verify: off
+    index: fluent_index
+    type: docker
+    trace_error: on
+    trace_output: o
+    suppress_type_name: on
+
+fluentbit_conf_filters: []
+
+fluentbit_custom_conf_files: []
+
+fluentbit_custom_parsers_files: []
